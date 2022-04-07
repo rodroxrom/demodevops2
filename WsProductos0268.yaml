@@ -1,0 +1,472 @@
+openapi: 3.0.0
+info:
+  title: WsProductos0268
+  description: Servicio de Generacion Oferta en Punta Be Clever
+  version: 1.0.0 
+paths:
+  /Generico/ObtenerOfertaEnPunta:
+    post:
+      tags:
+        - Ingresos
+      summary: Servicio de Generacion Oferta en Punta Be Clever
+      description: ""
+      operationId: ObtenerOfertaEnPunta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Entrada"
+        description: "Objeto que encapsula los parametros de entrada de la petición"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Salida"
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: "Internal Server Error"
+
+servers:
+  - url: https://serviciosexternostest.pichincha.com/api/WsProductos0268
+    variables:
+      numeroVersion:
+        default: unknown
+
+components:
+  schemas:
+    intervinientes:
+      type: object
+      properties:
+        Interviniente:
+          $ref: "#/components/schemas/interviniente"
+        productosSolicitados:
+          $ref: "#/components/schemas/productosSolicitados"
+      required:
+        - interviniente
+        - productosSolicitados
+
+    productosSolicitados:
+      type: object
+      properties:
+        productosSolicitado:
+          $ref: "#/components/schemas/productosSolicitado"
+      required:
+        - productosSolicitado
+
+    productosSolicitado:
+      type: array
+      items:
+        properties:
+          monto:
+            type: string
+            description: Monto del Crédito a solicitar
+            example: "8920.71"
+            maxLength: 20
+            minLength: 1
+          plazo:
+            type: string
+            description: Plazo del Crédito en meses
+            example: "36"
+            maxLength: 3
+          producto:
+            type: string
+            description: Producto relacionado al credito a solicitar. "21918-52116-384176"=VISA - "21918-52116-384151"=MASTERCARD - "21918-52116-384127"=DISCOVER - "21918-58634-21977"=PRECISO
+            example: "21918-58634-21977"
+          tasa:
+            type: string
+            description: Tasa del Crédito a solicitar
+            example: "16.06"
+            maxLength: 10
+          amortizacion:
+            type: string
+            description: Tipo de Tabla de Amortización para el credito. "FRANCESA" ó "ALEMANA"
+        required:
+          - monto
+          - producto
+          - amortizacion
+
+
+    interviniente:
+      type: array
+      items:
+        properties:
+          tipo:
+            type: string
+            description: Tipo de Interviniente que va a realizar el crédito. DE=DEUDOR - CD=CONYUGE DEUDOR - CO=CODEUDOR - CC=CONYUGE CODEUDOR - GR=GARANTE - CG#CONYUGE GARANTE - AD=ADICIONAL - ADNC=ADICIONAL NO CLIENTE
+            example: "DE"
+          cif:
+            type: string          
+            description: Codigo CIF del cliente. El formato debe sea a 16 digitos rellenos a la izquierda, como lo tiene Bancs.
+            example:  "0000000908020753"
+            maxLength: 16
+            minLength: 16            
+          tipoIdentificacion:
+            type: string
+            description: Codigo del Tipo de Identificación del Cliente. "0001"=Cedula - "0002"=RUC - "0003"=Pasaporte
+            example: "0001"
+          identificacion:
+            type: string
+            description: Número de Identificación del Cliente
+            example: "0908020753"
+          montoInversion:
+            type: string
+            description: Si el cliente tiene inversiones en cualquier institucion. Aplica cuando el producto es Tarjeta de Crédito
+            example: "12000.00"
+            maxLength: 20
+            minLength: 1
+          deudasNoDeclaradas:
+            type: string
+            description: Si el cliente tiene obligaciones adicionales, inclusive con otras instituciones financieras
+            example: "0.00"
+            maxLength: 20
+            minLength: 1
+          CuotasEnProceso:
+            type: string
+            description: Cuotas relacionadas a las obligaciones adicionales del cliente
+            example: "150.00"
+            maxLength: 20
+            minLength: 1
+          situacionesLaborales:
+            $ref: "#/components/schemas/situacionesLaborales"
+        required:
+            - tipo
+            - tipoIdentificacion
+            - identificacion
+            - situacionesLaborales
+
+    situacionesLaborales:
+      type: object
+      properties:
+        SituacionesLaborale:
+          $ref: "#/components/schemas/SituacionesLaborale"
+      required:
+        - SituacionesLaborale
+
+    SituacionesLaborale:
+      type: array
+      items:
+        properties:
+          fechaInicioTrabajoActual:
+            type: string
+            description: Fecha en la inicio actividades laborales en el trabajo actual
+            example: "2017-03-01"
+          fechaInicioTrabajoAnterior:
+            type: string
+            description: Fecha en la inicio actividades laborales en el trabajo anterior.
+            example: "2015-01-01"
+          fechaFinTrabajoAnterior:
+            type: string
+            description: Fecha en la finalizó actividades laborales en el trabajo anterior.
+            example: "2017-02-28"
+          situacionLaboral:
+            type: string
+            description: Situación Laboral del Cliente. "IN"=INDEPENDIENTE - "DE"=DEPENDIENTE - "PI"=PROFESIONAL INDEPENDIENTE - "RE"=RENTISTA - "PE"=PENSIONISTA - "JU"=JUBILADO
+            example: "DE"
+          ingresos:
+            type: string
+            description: Ingresos del cliente, tales como Sueldo
+            example: "1200.00"
+            maxLength: 20
+            minLength: 1
+          ventasAnualesDeclaradas:
+            type: string
+            description: Ventas anuales que realiza el cliente en relacion de No Dependencia
+            example: "24000.00"
+            maxLength: 20
+            minLength: 1
+      required:
+        - fechaInicioTrabajoActual
+        - situacionLaboral
+        - ingresos
+        
+
+    HeaderIn:
+      type: object
+      properties:
+        dispositivo:
+          type: string
+          maxLength: 32
+          description: Device Hash takes it from claims
+          example: "01010101010101010101010101010101"
+        empresa:
+          type: string
+          maxLength: 5
+          description: company code 0010 by default
+          example: "0010"
+        canal:
+          type: string
+          maxLength: 2
+          description: Code channel defined by business architecture WSO2 will send in the
+            Claim
+          example: "02"
+        medio:
+          type: string
+          maxLength: 6
+          description: Medium code defined by business architecture WSO2 will send in the
+            Claim
+          example: "020007"
+        aplicacion:
+          type: string
+          maxLength: 5
+          description: Application code defined by business architecture WSO2 will send in
+            the Claim
+          example: "00669"
+        agencia:
+          type: string
+          maxLength: 25
+          description: code of the agency where the user is registered
+          example: "197"
+        tipoTransaccion:
+          type: string
+          maxLength: 9
+          description: Application code defined by enterprise architecture each application must place this value is the transactional log transaction type.
+          example: "202026101"
+        geolocalizacion:
+          type: string
+          description: field describes the geolocation
+          example: ""
+        usuario:
+          type: string
+          maxLength: 10
+          description: generic user of the default transaction
+          example: USRTAGEW
+        unicidad:
+          type: string
+          maxLength: 70
+          description: HASH of the transaction component is generated with the uniqueness component
+          example: ""
+        guid:
+          type: string
+          maxLength: 40
+          description: Unique identifier of the transaction
+          example: 3F2504E04F8911D39A0C0305E82C3302
+        fechaHora:
+          type: string
+          maxLength: 18
+          description: date and time of transaction yyyyMMddhhmmssSSSS
+          example: "202103201505451252"
+        filler:
+          type: string
+          maxLength: 50
+          description: If additional fields are required, it must be previously agreed
+          example: ""
+        idioma:
+          type: string
+          maxLength: 5
+          description: Language WSO2 will send on the Claim
+          example: es-EC
+        sesion:
+          type: string
+          description: Session generated in WSO2 is sent in the claim
+          example: ASDASD77R01YH
+        ip:
+          type: string
+          maxLength: 15
+          description: Client IP address
+          example: 10.0.94.126
+        idCliente:
+          type: string
+          maxLength: 17
+          description: customer identification
+          example: "0908020753"
+        tipoIdCliente:
+          type: string
+          maxLength: 5
+          description: customer identification type
+          example: "0001"
+      required:
+        - dispositivo
+        - empresa
+        - canal
+        - medio
+        - aplicacion
+        - agencia
+        - tipotransaccion
+        - geolocalizacion
+        - usuario
+        - unicidad
+        - guid
+        - fechahora
+        - idioma
+        - sesion
+        - ip
+        - filler
+
+    BodyIn:
+      type: object
+      properties:
+        intervinientes:
+          $ref: "#/components/schemas/intervinientes"
+      required:
+        - intervinientes
+
+    Entrada:
+      type: object
+      properties:
+        headerIn:
+          $ref: "#/components/schemas/HeaderIn"
+        bodyIn:
+          $ref: "#/components/schemas/BodyIn"
+      required:
+        - headerIn
+        - bodyIn
+
+
+    Salida:
+      type: object
+      properties:
+        headerOut:
+          $ref: "#/components/schemas/HeaderOut"
+        error:
+          $ref: "#/components/schemas/Error"
+    Error:
+      type: object
+      properties:
+        codigo:
+          type: string
+          description: response code of zero orchestration is ok, different error
+          example: "0"
+        mensaje:
+          type: string
+          description: Orchestration response message
+          example: OK
+        mensajeNegocio:
+          type: string
+          description: Orchestration response message
+          example: Ejecución exitosa
+        tipo:
+          type: string
+          description: type of error returned by the orchestrator, fatal example
+          example: INFO
+        recurso:
+          type: string
+          description: describes where the error was spread
+          example: WsProductos0268/ObtenerOfertaEnPunta
+        componente:
+          type: string
+          description: describes what method the error propagated
+          example: ObtenerOfertaEnPunta
+        backend:
+          type: string
+          maxLength: 5
+          description: code of the invoked application
+          example: "00638"
+
+    HeaderOut:
+      type: object
+      properties:
+        dispositivo:
+          type: string
+          maxLength: 32
+          description: Device Hash takes it from claims
+          example: "01010101010101010101010101010101"
+        empresa:
+          type: string
+          maxLength: 5
+          description: company code 0010 by default
+          example: "0010"
+        canal:
+          type: string
+          maxLength: 2
+          description: Code channel defined by business architecture WSO2 will send in the
+            Claim
+          example: "02"
+        medio:
+          type: string
+          maxLength: 6
+          description: Medium code defined by business architecture WSO2 will send in the
+            Claim
+          example: "020007"
+        aplicacion:
+          type: string
+          maxLength: 5
+          description: Application code defined by business architecture WSO2 will send in
+            the Claim
+          example: "00669"
+        agencia:
+          type: string
+          maxLength: 25
+          description: code of the agency where the user is registered
+          example: "197"
+        tipoTransaccion:
+          type: string
+          maxLength: 9
+          description: Application code defined by enterprise architecture each application must place this value is the transactional log transaction type.
+          example: "202026101"
+        geolocalizacion:
+          type: string
+          description: field describes the geolocation
+          example: ""
+        usuario:
+          type: string
+          maxLength: 10
+          description: generic user of the default transaction
+          example: USRTAGEW
+        unicidad:
+          type: string
+          maxLength: 70
+          description: HASH of the transaction component is generated with the uniqueness component
+          example: ""
+        guid:
+          type: string
+          maxLength: 40
+          description: Unique identifier of the transaction
+          example: 3F2504E04F8911D39A0C0305E82C3302
+        fechaHora:
+          type: string
+          maxLength: 18
+          description: date and time of transaction yyyyMMddhhmmssSSSS
+          example: "202103201505451252"
+        filler:
+          type: string
+          maxLength: 50
+          description: If additional fields are required, it must be previously agreed
+          example: ""
+        idioma:
+          type: string
+          maxLength: 5
+          description: Language WSO2 will send on the Claim
+          example: es-EC
+        sesion:
+          type: string
+          description: Session generated in WSO2 is sent in the claim
+          example: ASDASD77R01YH
+        ip:
+          type: string
+          maxLength: 15
+          description: Client IP address
+          example: 10.0.94.126
+        idCliente:
+          type: string
+          maxLength: 17
+          description: customer identification
+          example: "0908020753"
+        tipoIdCliente:
+          type: string
+          maxLength: 5
+          description: customer identification type
+          example: "0001"
+      required:
+        - dispositivo
+        - empresa
+        - canal
+        - medio
+        - aplicacion
+        - agencia
+        - tipotransaccion
+        - geolocalizacion
+        - usuario
+        - unicidad
+        - guid
+        - fechahora
+        - idioma
+        - sesion
+        - ip
+        - filler
+        
